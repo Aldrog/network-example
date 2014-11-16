@@ -1,31 +1,45 @@
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <iostream>
-#include <stdio.h>
-#include <unistd.h>
-#include <string>
+#include <arpa/inet.h>	//Для типов socket, sockaddr_in, и для связанных с ними функций и констант
+#include <unistd.h>	//Для операций read и write над потоками данных
+#include <stdlib.h>	//Для exit
+#include <iostream>	//Для std
+#include <stdio.h>	//Для perror
 
-using namespace std;
+//Максимальная длина принимаемой строки
+const int MAXRCVLINE = 64;
+
+//Выводит сообщение и завершает программу
+int ExitWithError(char* e){
+  perror(e);
+  exit(2);
+}
 
 int main(int argc, char ** argv){
-  int sockfd,n;
-  char recvline[64];
-  struct sockaddr_in servaddr;
+  if(argc < 2)
+    ExitWithError("Missing IP-address");
+  
+  int sockfd,n;	//Дескриптор сокета и длина полученной строки
+  char recvline[MAXRCVLINE];	//Строка
+  struct sockaddr_in servaddr;	//Адрес сервера
+  //Открываем сокет, записываем дескриптор в sockfd
   sockfd = socket(AF_INET,SOCK_STREAM,0);
   if(sockfd < 0)
-    perror("Error opening socket");
+    ExitWithError("Error opening socket");
+  //Задаём тип адреса - IPv4
   servaddr.sin_family = AF_INET;
+  //Задаём порт
   servaddr.sin_port = htons(322);
+  //Задаём IP-адрес
   inet_pton(AF_INET,argv[1],&servaddr.sin_addr);
-  cout << "Connecting to " << argv[1] << '\n';
+  std::cout << "Connecting to " << argv[1] << '\n';
+  //Подключаемся к серверу
   if(connect(sockfd, (sockaddr *) &servaddr, sizeof(servaddr)) < 0)
-    perror("Error connecting");
-  while ( (n = read(sockfd,recvline,64)) > 0) {
-    if(n < 0)
-      perror("Error reading");
-    cout << recvline << '\n';
+    ExitWithError("Error connecting");
+  //Читаем из сокета в recvline
+  while ( (n = read(sockfd, recvline, MAXRCVLINE)) > 0) {
+    //Выводим полученное сообщение на экран
+    std::cout << recvline << '\n';
   }
+  if(n < 0)
+    ExitWithError("Error reading");
   return 0;
 }
