@@ -1,4 +1,7 @@
-network-example
+C++ network programming example
 ===============
 
-C++ network programming example
+sender.cpp - Сервер. Он прослушивает входящие подключения и отвечает на них сообщением "hello".
+
+receiver.cpp - Клиент. Он подключается к IP-адресу, указанному в командной строке и выводит полученное сообщение.
+Пример вызова: receiver 127.0.0.1
