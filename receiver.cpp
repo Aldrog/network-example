@@ -18,7 +18,7 @@ int main(int argc, char ** argv){
     ExitWithError((char*)"Missing IP-address");
   
   int sockfd,n;	//Дескриптор сокета и длина полученной строки
-  char recvline[MAXLINE];	//Строка
+  char recvline[MAXLINE+1];	//Строка
   struct sockaddr_in servaddr;	//Информация о сервере
   //Открываем сокет, записываем дескриптор в sockfd
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -36,6 +36,8 @@ int main(int argc, char ** argv){
     ExitWithError((char*)"Error connecting");
   //Читаем из сокета в recvline
   while ( (n = read(sockfd, recvline, MAXLINE)) > 0) {
+    //Добавляем \0 в конец строки
+    recvline[n] = 0;
     //Выводим полученное сообщение на экран
     std::cout << recvline << '\n';
   }
