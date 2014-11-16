@@ -4,8 +4,8 @@
 #include <iostream>	//Для std
 #include <stdio.h>	//Для perror
 
-//Максимальная длина принимаемой строки
-const int MAXRCVLINE = 64;
+//Максимальная длина принимаемой строки (может быть любой)
+const int MAXLINE = 64;
 
 //Выводит сообщение и завершает программу
 int ExitWithError(char* e){
@@ -15,15 +15,15 @@ int ExitWithError(char* e){
 
 int main(int argc, char ** argv){
   if(argc < 2)
-    ExitWithError("Missing IP-address");
+    ExitWithError((char*)"Missing IP-address");
   
   int sockfd,n;	//Дескриптор сокета и длина полученной строки
-  char recvline[MAXRCVLINE];	//Строка
-  struct sockaddr_in servaddr;	//Адрес сервера
+  char recvline[MAXLINE];	//Строка
+  struct sockaddr_in servaddr;	//Информация о сервере
   //Открываем сокет, записываем дескриптор в sockfd
-  sockfd = socket(AF_INET,SOCK_STREAM,0);
+  sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if(sockfd < 0)
-    ExitWithError("Error opening socket");
+    ExitWithError((char*)"Error opening socket");
   //Задаём тип адреса - IPv4
   servaddr.sin_family = AF_INET;
   //Задаём порт
@@ -33,13 +33,13 @@ int main(int argc, char ** argv){
   std::cout << "Connecting to " << argv[1] << '\n';
   //Подключаемся к серверу
   if(connect(sockfd, (sockaddr *) &servaddr, sizeof(servaddr)) < 0)
-    ExitWithError("Error connecting");
+    ExitWithError((char*)"Error connecting");
   //Читаем из сокета в recvline
-  while ( (n = read(sockfd, recvline, MAXRCVLINE)) > 0) {
+  while ( (n = read(sockfd, recvline, MAXLINE)) > 0) {
     //Выводим полученное сообщение на экран
     std::cout << recvline << '\n';
   }
   if(n < 0)
-    ExitWithError("Error reading");
+    ExitWithError((char*)"Error reading");
   return 0;
 }
